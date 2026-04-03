@@ -3,11 +3,14 @@ import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { get } from '../utils/request'
 import { ref } from 'vue'
+import { escapeHtml } from '../utils/security'
 
 const auth = useAuthStore()
 const router = useRouter()
 
 const apiResult = ref<string>('')
+const userInput = ref('<img src=x onerror=alert(1) />')
+const safePreview = ref('')
 
 const handleLogout = () => {
   auth.clearAuth()
@@ -26,6 +29,10 @@ const callApi = async () => {
     console.error(error)
     apiResult.value = '请求失败（请根据实际后端调整接口）'
   }
+}
+
+const previewSafeHtml = () => {
+  safePreview.value = escapeHtml(userInput.value)
 }
 </script>
 
@@ -52,6 +59,21 @@ const callApi = async () => {
         <button class="primary" @click="callApi">调用示例接口（带 token）</button>
 
         <p v-if="apiResult" class="result">{{ apiResult }}</p>
+
+        <div class="xss-demo">
+          <h3>XSS 安全渲染示例</h3>
+          <textarea
+            v-model="userInput"
+            class="editor"
+            rows="4"
+            placeholder="输入一段可能含有 HTML 的内容"
+          />
+          <button class="secondary" @click="previewSafeHtml">安全预览</button>
+          <div v-if="safePreview" class="preview">
+            <p class="label">转义后输出（可安全用 v-html）</p>
+            <div class="output" v-html="safePreview" />
+          </div>
+        </div>
       </section>
     </main>
   </div>
@@ -160,6 +182,54 @@ const callApi = async () => {
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.6);
+  font-size: 13px;
+}
+
+.xss-demo {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.xss-demo h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.editor {
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #e5e7eb;
+  background: rgba(15, 23, 42, 0.9);
+  resize: vertical;
+}
+
+.secondary {
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: #e2e8f0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.preview {
+  margin-top: 10px;
+}
+
+.label {
+  margin: 0 0 6px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.output {
+  border-radius: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.5);
+  padding: 10px;
   font-size: 13px;
 }
 </style>

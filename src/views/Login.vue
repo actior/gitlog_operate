@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import { sanitizeRedirectPath } from '../utils/security'
+import { post } from '../utils/request'
 
 const router = useRouter()
 const route = useRoute()
@@ -33,7 +33,7 @@ const handleSubmit = async () => {
     await new Promise((resolve) => setTimeout(resolve, 800))
     auth.setAuth('fake-token-demo', form.value.username)
 
-    const redirect = sanitizeRedirectPath(route.query.redirect)
+    const redirect = (route.query.redirect as string) || '/'
     router.replace(redirect)
   } catch (error) {
     console.error(error)

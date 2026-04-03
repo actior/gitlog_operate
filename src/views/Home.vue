@@ -82,7 +82,7 @@ const previewSafeHtml = () => {
 <style scoped>
 .home {
   min-height: 100vh;
-  background: radial-gradient(circle at top, #1e293b, #020617);
+  background: radial-gradient(circle at top, #1e293b,rgb(41, 73, 218));
   color: #e5e7eb;
 }
 
